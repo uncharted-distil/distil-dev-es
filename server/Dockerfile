@@ -1,5 +1,5 @@
 # Set the base image to elasticsearch alpine
-FROM elasticsearch:2.4-alpine
+FROM elasticsearch:5.4-alpine
 
 # make sure package db is up to date
 RUN apk update
