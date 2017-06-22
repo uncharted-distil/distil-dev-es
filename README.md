@@ -1,4 +1,4 @@
-# distil-es-redis
+# distil-dev-es
 
 Provides a dockerfile and supporting scripts to generate images containing Redis and ElasticSearch v2.4.  The image build step uses [distil-ingest](https://github.com/unchartedsoftware/veldt-ingest) to build a [distil](https://github.com/unchartedsoftware/veldt)-ready index from source data; this index is saved as part of the image, allowing for generation of drop-in test container that can be run locally.
 
