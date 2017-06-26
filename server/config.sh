@@ -12,4 +12,3 @@ DATA_PATH=~/data/d3m
 
 # unset input compression - switch to gzip as required
 INPUT_COMPRESSION=
-
