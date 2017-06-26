@@ -1,21 +1,23 @@
 # distil-dev-es
 
-Provides a dockerfile and supporting scripts to generate images containing ElasticSearch v5.4.  The image build step uses [distil-ingest](https://github.com/unchartedsoftware/veldt-ingest) to build a [distil](https://github.com/unchartedsoftware/veldt)-ready index from source data; this index is saved as part of the image, allowing for generation of drop-in test container that can be run locally.
+Provides a dockerfile and supporting scripts to generate images containing Elasticsearch v5.4.  The image build step uses [distil-ingest](https://github.com/unchartedsoftware/veldt-ingest) to build a [distil](https://github.com/unchartedsoftware/veldt)-ready index from source data; this index is saved as part of the image, allowing for generation of drop-in test container that can be run locally.
 
 ## Dependencies
 
 - [Go](https://golang.org/) version 1.6+ with the `GOPATH` environment variable specified and `$GOPATH/bin` in your `PATH`.
-- [Docker](http://www.docker.com/)
+- [Docker](http://www.docker.com/) platform.
 
-## Building an Image
+## Building the Image
 
-1. Edit the docker image name and version, as well as the ingest data source info in `./server/config.sh`.  Data must be stored locally - HDFS storage is not yet supported.
+1. Edit `./server/config.sh`:
+    - Ensure the docker image name and version are specified:
+        - `DOCKER_IMAGE_NAME`
+        - `DOCKER_IMAGE_VERSION`
+    - Ensure the data path, and datasets are specified and data stored under those paths:
+        - `DATASETS`
+        - `DATA_PATH`
 2. Run `./build.sh` to build the image.
 
 ## Deploying the Container
 
 A container based on the image can be deployed using the provided `./run.sh` script, or a command based on the contents of that script.  *Note*: The `--user elasticsearch` parameter must be passed to `docker run` or the command will fail..
-
-## Customization
-
-`./server/config.sh` contains parameters for modifying the input dataset list.  The datasets must be stored in the location specified by `DATA_DIR` as sub-folders in the D3M format.  The `DATASETS` variable needs to be set to indicate the sub-directores to be included in the ingest.
