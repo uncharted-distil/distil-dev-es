@@ -1,6 +1,6 @@
 # distil-dev-es
 
-Provides a dockerfile and supporting scripts to generate images containing Redis and ElasticSearch v2.4.  The image build step uses [distil-ingest](https://github.com/unchartedsoftware/veldt-ingest) to build a [distil](https://github.com/unchartedsoftware/veldt)-ready index from source data; this index is saved as part of the image, allowing for generation of drop-in test container that can be run locally.
+Provides a dockerfile and supporting scripts to generate images containing ElasticSearch v5.4.  The image build step uses [distil-ingest](https://github.com/unchartedsoftware/veldt-ingest) to build a [distil](https://github.com/unchartedsoftware/veldt)-ready index from source data; this index is saved as part of the image, allowing for generation of drop-in test container that can be run locally.
 
 ## Dependencies
 
@@ -18,4 +18,4 @@ A container based on the image can be deployed using the provided `./run.sh` scr
 
 ## Customization
 
-`./server/config.sh` contains parameters for modifying the input dataset list.  The datasets must be stored in the location specified by `DATA_DIR` as sub-folders in the D3M format.  The `DATASETS` varaible needs to be set to indicate the sub-directores to be included in the ingest.
+`./server/config.sh` contains parameters for modifying the input dataset list.  The datasets must be stored in the location specified by `DATA_DIR` as sub-folders in the D3M format.  The `DATASETS` variable needs to be set to indicate the sub-directores to be included in the ingest.

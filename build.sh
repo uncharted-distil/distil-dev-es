@@ -16,8 +16,8 @@ mv distil-ingest ./server
 echo -e "${HIGHLIGHT}Copying D3M data..${NC}"
 mkdir -p ./server/data
 for dataset in "${DATASETS[@]}"
-do    
-    cp -r $DATA_PATH/$dataset ./server/data    
+do
+    cp -r $DATA_PATH/$dataset ./server/data
 done
 
 
@@ -26,4 +26,3 @@ cd server
 docker build -t docker.uncharted.software/$DOCKER_IMAGE_NAME:${DOCKER_IMAGE_VERSION} .
 cd ..
 echo -e "${HIGHLIGHT}Done${NC}"
-

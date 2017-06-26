@@ -4,7 +4,7 @@ FROM elasticsearch:5.4-alpine
 # make sure package db is up to date
 RUN apk update
 
-# missing from baseline alpine 
+# missing from baseline alpine
 RUN apk add --no-cache ca-certificates
 
 # download build toolchain
@@ -13,26 +13,13 @@ RUN apk add --no-cache --virtual .build-deps \
   linux-headers \
   make \
   musl-dev \
-  tar 
-
-# download and extract redis src
-RUN wget -O redis.tar.gz http://download.redis.io/releases/redis-3.2.8.tar.gz; \
-  mkdir -p /usr/src/redis; \
-  tar -xzf redis.tar.gz -C /usr/src/redis --strip-components=1; \
-  rm redis.tar.gz
-
-# build redis and clean up
-RUN make -C /usr/src/redis && make -C /usr/src/redis install; \
-  rm -r /usr/src/redis && apk del .build-deps; \
-  mkdir -p /usr/local/var/db/redis
-ADD redis.conf /etc
-
+  tar
 
 # base ES image sets default data dir to volume which means it won't persist
 # if we ingest.  We make a new directory for data here and update the config
 # file to point to it.
 RUN mkdir /data && \
-  chown -R elasticsearch:elasticsearch /data && \  
+  chown -R elasticsearch:elasticsearch /data && \
   echo 'path.data: /data' >> config/elasticsearch.yml && \
   echo 'http.compression: true' >> config/elasticsearch.yml
 
@@ -64,7 +51,6 @@ RUN rm -r -f /distil-ingest; \
 ADD start_services.sh /
 
 # expose standard ports
-EXPOSE 6379
 EXPOSE 9200
 EXPOSE 9300
 
