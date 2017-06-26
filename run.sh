@@ -3,6 +3,7 @@
 source ./server/config.sh
 
 docker run \
+  -t \
   --user elasticsearch \
   --rm \
   --name $DOCKER_IMAGE_NAME \
