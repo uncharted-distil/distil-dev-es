@@ -1,6 +1,6 @@
 # distil-dev-es
 
-Provides a dockerfile and supporting scripts to generate images containing Elasticsearch v5.4.  The image build step uses [distil-ingest](https://github.com/unchartedsoftware/veldt-ingest) to build a [distil](https://github.com/unchartedsoftware/veldt)-ready index from source data; this index is saved as part of the image, allowing for generation of drop-in test container that can be run locally.
+Provides a dockerfile and supporting scripts to generate images containing Elasticsearch v5.4. The image build step uses [distil-ingest](https://github.com/unchartedsoftware/distil-ingest) to build a [distil](https://github.com/unchartedsoftware/distil)-ready index from source data; this index is saved as part of the image, allowing for generation of drop-in test container that can be run locally.
 
 ## Dependencies
 
@@ -15,7 +15,7 @@ Provides a dockerfile and supporting scripts to generate images containing Elast
         - `DOCKER_IMAGE_VERSION`
     - Ensure the data path, and datasets are specified and data stored under those paths:
         - `DATASETS`
-        - `DATA_PATH`
+        - `HOST_DATA_DIR`
 2. Run `./build.sh` to build the image.
 
 ## Deploying the Container

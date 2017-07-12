@@ -28,6 +28,7 @@ RUN mkdir -p /distil-ingest
 WORKDIR /distil-ingest
 ADD config.sh .
 ADD distil-ingest .
+ADD distil-merge .
 ADD ingest.sh .
 
 # copy in d3m test data
@@ -44,6 +45,7 @@ RUN /docker-entrypoint.sh elasticsearch -p /tmp/epid & \
 # remove ingest related files
 WORKDIR /
 RUN rm -r -f /distil-ingest; \
+  rm -r -f /distil-merge; \
   rm /wait-for-it.sh; \
   rm -r -f /input;
 

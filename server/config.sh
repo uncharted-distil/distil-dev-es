@@ -2,13 +2,31 @@
 
 # name and version of docker image that will be created
 DOCKER_IMAGE_NAME=distil_dev_es
-DOCKER_IMAGE_VERSION=0.1
+DOCKER_IMAGE_VERSION=0.2
 
 # datasets to ingest
 DATASETS=(o_185 o_196 o_313 o_38 o_4550)
 
 # path to data on local system (ingest from HDFS not currently supported)
-DATA_PATH=~/data/d3m
+HOST_DATA_DIR=~/data/d3m
+
+# path to data in the docker container
+CONTAINER_DATA_DIR=/input/d3m
+
+# dataset schema file
+SCHEMA=data/dataSchema.json
+
+# dataset training file
+TRAINING_DATA=data/trainData.csv
+
+# dataset training target
+TRAINING_TARGETS=data/trainTargets.csv
+
+# merged dataset output
+MERGED_OUTPUT=data/merged.csv
+
+# es endpoint
+ES_ENDPOINT=http://localhost:9200
 
 # unset input compression - switch to gzip as required
 INPUT_COMPRESSION=
