@@ -1,4 +1,5 @@
 server/data
 distil-ingest
 distil-merge
+distil-classify
 .DS_Store
