@@ -1,6 +1,14 @@
 # Set the base image to elasticsearch alpine
 FROM elasticsearch:5.4-alpine
 
+ARG aws_access_key
+ARG aws_secret_key
+ARG aws_region
+
+ENV AWS_ACCESS_KEY=$aws_access_key
+ENV AWS_SECRET_KEY=$aws_secret_key
+ENV AWS_REGION=$aws_region
+
 # make sure package db is up to date
 RUN apk update
 
@@ -29,6 +37,7 @@ WORKDIR /distil-ingest
 ADD config.sh .
 ADD distil-ingest .
 ADD distil-merge .
+ADD distil-classify .
 ADD ingest.sh .
 
 # copy in d3m test data
@@ -46,6 +55,7 @@ RUN /docker-entrypoint.sh elasticsearch -p /tmp/epid & \
 WORKDIR /
 RUN rm -r -f /distil-ingest; \
   rm -r -f /distil-merge; \
+  rm -r -f /distil-classify; \
   rm /wait-for-it.sh; \
   rm -r -f /input;
 

@@ -12,21 +12,3 @@ HOST_DATA_DIR=~/data/d3m
 
 # path to data in the docker container
 CONTAINER_DATA_DIR=/input/d3m
-
-# dataset schema file
-SCHEMA=data/dataSchema.json
-
-# dataset training file
-TRAINING_DATA=data/trainData.csv
-
-# dataset training target
-TRAINING_TARGETS=data/trainTargets.csv
-
-# merged dataset output
-MERGED_OUTPUT=data/merged.csv
-
-# es endpoint
-ES_ENDPOINT=http://localhost:9200
-
-# unset input compression - switch to gzip as required
-INPUT_COMPRESSION=
