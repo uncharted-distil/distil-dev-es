@@ -1,10 +1,18 @@
 # Set the base image to elasticsearch alpine
 FROM elasticsearch:5.4-alpine
 
+ARG aws_access_key
+ARG aws_secret_key
+ARG aws_region
+
+ENV AWS_ACCESS_KEY=$aws_access_key
+ENV AWS_SECRET_KEY=$aws_secret_key
+ENV AWS_REGION=$aws_region
+
 # make sure package db is up to date
 RUN apk update
 
-# missing from baseline alpine 
+# missing from baseline alpine
 RUN apk add --no-cache ca-certificates
 
 # download build toolchain
@@ -13,26 +21,13 @@ RUN apk add --no-cache --virtual .build-deps \
   linux-headers \
   make \
   musl-dev \
-  tar 
-
-# download and extract redis src
-RUN wget -O redis.tar.gz http://download.redis.io/releases/redis-3.2.8.tar.gz; \
-  mkdir -p /usr/src/redis; \
-  tar -xzf redis.tar.gz -C /usr/src/redis --strip-components=1; \
-  rm redis.tar.gz
-
-# build redis and clean up
-RUN make -C /usr/src/redis && make -C /usr/src/redis install; \
-  rm -r /usr/src/redis && apk del .build-deps; \
-  mkdir -p /usr/local/var/db/redis
-ADD redis.conf /etc
-
+  tar
 
 # base ES image sets default data dir to volume which means it won't persist
 # if we ingest.  We make a new directory for data here and update the config
 # file to point to it.
 RUN mkdir /data && \
-  chown -R elasticsearch:elasticsearch /data && \  
+  chown -R elasticsearch:elasticsearch /data && \
   echo 'path.data: /data' >> config/elasticsearch.yml && \
   echo 'http.compression: true' >> config/elasticsearch.yml
 
@@ -41,6 +36,8 @@ RUN mkdir -p /distil-ingest
 WORKDIR /distil-ingest
 ADD config.sh .
 ADD distil-ingest .
+ADD distil-merge .
+ADD distil-classify .
 ADD ingest.sh .
 
 # copy in d3m test data
@@ -57,6 +54,8 @@ RUN /docker-entrypoint.sh elasticsearch -p /tmp/epid & \
 # remove ingest related files
 WORKDIR /
 RUN rm -r -f /distil-ingest; \
+  rm -r -f /distil-merge; \
+  rm -r -f /distil-classify; \
   rm /wait-for-it.sh; \
   rm -r -f /input;
 
@@ -64,7 +63,6 @@ RUN rm -r -f /distil-ingest; \
 ADD start_services.sh /
 
 # expose standard ports
-EXPOSE 6379
 EXPOSE 9200
 EXPOSE 9300
 
