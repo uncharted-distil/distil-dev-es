@@ -37,6 +37,7 @@ WORKDIR /distil-ingest
 ADD config.sh .
 ADD distil-ingest .
 ADD distil-merge .
+ADD distil-rank .
 ADD distil-classify .
 ADD ingest.sh .
 
@@ -55,6 +56,7 @@ RUN /docker-entrypoint.sh elasticsearch -p /tmp/epid & \
 WORKDIR /
 RUN rm -r -f /distil-ingest; \
   rm -r -f /distil-merge; \
+  rm -r -f /distil-rank; \
   rm -r -f /distil-classify; \
   rm /wait-for-it.sh; \
   rm -r -f /input;
