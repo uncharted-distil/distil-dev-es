@@ -10,12 +10,15 @@ echo -e "${HIGHLIGHT}Getting distil-ingest..${NC}"
 # get distil-ingest and force a static rebuild of it so that it can run on Alpine
 go get -u -v github.com/unchartedsoftware/distil-ingest/cmd/distil-merge
 go get -u -v github.com/unchartedsoftware/distil-ingest/cmd/distil-classify
+go get -u -v github.com/unchartedsoftware/distil-ingest/cmd/distil-rank
 go get -u -v github.com/unchartedsoftware/distil-ingest/cmd/distil-ingest
 env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -a github.com/unchartedsoftware/distil-ingest/cmd/distil-merge
 env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -a github.com/unchartedsoftware/distil-ingest/cmd/distil-classify
+env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -a github.com/unchartedsoftware/distil-ingest/cmd/distil-rank
 env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -a github.com/unchartedsoftware/distil-ingest/cmd/distil-ingest
 mv distil-merge ./server
 mv distil-classify ./server
+mv distil-rank ./server
 mv distil-ingest ./server
 
 echo -e "${HIGHLIGHT}Copying D3M data..${NC}"

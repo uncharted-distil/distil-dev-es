@@ -45,6 +45,29 @@ do
         --output="$CONTAINER_DATA_DIR/$DATASET/$CLASSIFICATION_OUTPUT_PATH"
 done
 
+AWS_RANK_OUTPUT_BUCKET=d3m-data
+AWS_RANK_OUTPUT_KEY_PREFIX=numeric_o_data
+AWS_RANK_OUTPUT_KEY_SUFFIX=_numeric.csv
+RANKING_KAFKA_ENDPOINT=10.108.4.41:9092
+IMPORTANCE_OUTPUT=/data/importance.json
+
+for DATASET in "${DATASETS[@]}"
+do
+    echo "--------------------------------------------------------------------------------"
+    echo " Ranking $DATASET dataset"
+    echo "--------------------------------------------------------------------------------"
+    ./distil-rank \
+        --schema="$CONTAINER_DATA_DIR/$DATASET/$SCHEMA_PATH" \
+        --dataset="$CONTAINER_DATA_DIR/$DATASET/$MERGED_OUTPUT_PATH" \
+        --classification="$CONTAINER_DATA_DIR/$DATASET/$CLASSIFICATION_OUTPUT_PATH" \
+        --output-bucket="$AWS_RANK_OUTPUT_BUCKET" \
+        --output-key="$AWS_RANK_OUTPUT_KEY_PREFIX/$DATASET$AWS_RANK_OUTPUT_KEY_SUFFIX" \
+        --has-header=$MERGE_HAS_HEADER \
+        --include-header=$MERGE_INCLUDE_HEADER \
+        --kafka-endpoints="$RANKING_KAFKA_ENDPOINT" \
+        --output="$CONTAINER_DATA_DIR/$DATASET/$IMPORTANCE_OUTPUT"
+done
+
 METADATA_INDEX=datasets
 ES_ENDPOINT=http://localhost:9200
 
@@ -60,5 +83,6 @@ do
         --schema="$CONTAINER_DATA_DIR/$DATASET/$SCHEMA_PATH" \
         --dataset="$CONTAINER_DATA_DIR/$DATASET/$MERGED_OUTPUT_PATH" \
         --classification="$CONTAINER_DATA_DIR/$DATASET/$CLASSIFICATION_OUTPUT_PATH" \
+        --importance="$CONTAINER_DATA_DIR/$DATASET/$IMPORTANCE_OUTPUT" \
         --clear-existing
 done
