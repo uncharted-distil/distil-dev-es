@@ -40,6 +40,7 @@ docker build \
     --build-arg aws_access_key=$AWS_ACCESS_KEY \
     --build-arg aws_secret_key=$AWS_SECRET_KEY \
     --build-arg aws_region=$AWS_REGION  \
+    --build-arg smmry_key=$SMMRY_API_KEY  \
     --tag docker.uncharted.software/$DOCKER_IMAGE_NAME:${DOCKER_IMAGE_VERSION} \
     --tag docker.uncharted.software/$DOCKER_IMAGE_NAME:latest .
 cd ..

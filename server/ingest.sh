@@ -70,6 +70,7 @@ done
 
 METADATA_INDEX=datasets
 ES_ENDPOINT=http://localhost:9200
+SUMMARY_OUTPUT_PATH=summary.txt
 
 for DATASET in "${DATASETS[@]}"
 do
@@ -83,6 +84,7 @@ do
         --schema="$CONTAINER_DATA_DIR/$DATASET/$SCHEMA_PATH" \
         --dataset="$CONTAINER_DATA_DIR/$DATASET/$MERGED_OUTPUT_PATH" \
         --classification="$CONTAINER_DATA_DIR/$DATASET/$CLASSIFICATION_OUTPUT_PATH" \
+        --summary="$CONTAINER_DATA_DIR/$DATASET/$SUMMARY_OUTPUT_PATH" \
         --importance="$CONTAINER_DATA_DIR/$DATASET/$IMPORTANCE_OUTPUT" \
         --clear-existing
 done
