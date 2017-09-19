@@ -4,10 +4,12 @@ FROM elasticsearch:5.4-alpine
 ARG aws_access_key
 ARG aws_secret_key
 ARG aws_region
+ARG smmry_key
 
 ENV AWS_ACCESS_KEY=$aws_access_key
 ENV AWS_SECRET_KEY=$aws_secret_key
 ENV AWS_REGION=$aws_region
+ENV SMMRY_API_KEY=$smmry_key
 
 # make sure package db is up to date
 RUN apk update
