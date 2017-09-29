@@ -5,7 +5,6 @@ source ./server/config.sh
 docker run \
   -t \
   -i \
-  --user elasticsearch \
   --rm \
   --name $DOCKER_IMAGE_NAME \
   -p 9200:9200 \

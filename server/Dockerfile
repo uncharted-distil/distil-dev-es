@@ -70,4 +70,6 @@ ADD start_services.sh /
 EXPOSE 9200
 EXPOSE 9300
 
+USER elasticsearch
+
 CMD . /start_services.sh
