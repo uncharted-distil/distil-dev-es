@@ -20,4 +20,4 @@ Provides a dockerfile and supporting scripts to generate images containing Elast
 
 ## Deploying the Container
 
-A container based on the image can be deployed using the provided `./run.sh` script, or a command based on the contents of that script.  *Note*: The `--user elasticsearch` parameter must be passed to `docker run` or the command will fail..
+A container based on the image can be deployed using the provided `./run.sh` script, or a command based on the contents of that script.
