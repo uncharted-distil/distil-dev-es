@@ -36,7 +36,7 @@ echo -e "${HIGHLIGHT}Building image ${DOCKER_IMAGE_NAME}...${NC}"
 # build the docker image
 cd server
 
-docker build \
+docker build --no-cache \
     --build-arg aws_access_key=$AWS_ACCESS_KEY \
     --build-arg aws_secret_key=$AWS_SECRET_KEY \
     --build-arg aws_region=$AWS_REGION  \

@@ -72,6 +72,7 @@ done
 METADATA_INDEX=datasets
 ES_ENDPOINT=http://localhost:9200
 SUMMARY_OUTPUT_PATH=summary.txt
+TYPE_SOURCE=classification
 
 for DATASET in "${DATASETS[@]}"
 do
@@ -87,5 +88,6 @@ do
         --classification="$CONTAINER_DATA_DIR/$DATASET/$CLASSIFICATION_OUTPUT_PATH" \
         --summary="$CONTAINER_DATA_DIR/$DATASET/$SUMMARY_OUTPUT_PATH" \
         --importance="$CONTAINER_DATA_DIR/$DATASET/$IMPORTANCE_OUTPUT" \
+        --type-source="$TYPE_SOURCE" \
         --clear-existing
 done
