@@ -2,7 +2,7 @@
 
 # name and version of docker image that will be created
 DOCKER_IMAGE_NAME=distil_dev_es
-DOCKER_IMAGE_VERSION=0.7.0
+DOCKER_IMAGE_VERSION=0.7.1
 
 # datasets to ingest
 DATASETS=(r_26 r_27 r_32 r_60 o_185 o_196 o_313 o_38 o_4550)
