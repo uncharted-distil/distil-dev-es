@@ -8,11 +8,6 @@ TRAINING_TARGETS_PATH=/data/trainTargets.csv
 RAW_DATA=/data/raw_data
 MERGED_OUTPUT_PATH=/data/merged.csv
 
-AWS_S3_HOST=https://s3.amazonaws.com/
-AWS_S3_BUCKET=d3m-data
-AWS_S3_KEY_PREFIX=merged_o_data
-AWS_S3_KEY_SUFFIX=_merged.csv
-
 OUTPUT_SCHEMA=/data/mergedDataSchema.json
 MERGE_HAS_HEADER=1
 
@@ -26,8 +21,6 @@ do
         --training-data="$CONTAINER_DATA_DIR/$DATASET/$TRAINING_DATA_PATH" \
         --training-targets="$CONTAINER_DATA_DIR/$DATASET/$TRAINING_TARGETS_PATH" \
         --raw-data="$CONTAINER_DATA_DIR/$DATASET/$RAW_DATA" \
-        --output-bucket="$AWS_S3_BUCKET" \
-        --output-key="$AWS_S3_KEY_PREFIX/$DATASET$AWS_S3_KEY_SUFFIX" \
         --output-path="$CONTAINER_DATA_DIR/$DATASET/$MERGED_OUTPUT_PATH" \
         --output-schema-path="$CONTAINER_DATA_DIR/$DATASET/$OUTPUT_SCHEMA" \
         --has-header=$MERGE_HAS_HEADER \
