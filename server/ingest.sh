@@ -76,7 +76,8 @@ do
     ./distil-ingest \
         --es-endpoint="$ES_ENDPOINT" \
         --es-metadata-index="$METADATA_INDEX" \
-        --es-data-index="d_$DATASET" \
+        --es-data-index="$DATASET" \
+        --es-dataset-prefix="d_" \
         --schema="$CONTAINER_DATA_DIR/${DATASET}/${DATASET}$DATASET_FOLDER_SUFFIX/$OUTPUT_SCHEMA" \
         --dataset="$CONTAINER_DATA_DIR/${DATASET}/${DATASET}$DATASET_FOLDER_SUFFIX/$MERGED_OUTPUT_PATH" \
         --classification="$CONTAINER_DATA_DIR/${DATASET}/${DATASET}$DATASET_FOLDER_SUFFIX/$CLASSIFICATION_OUTPUT_PATH" \
