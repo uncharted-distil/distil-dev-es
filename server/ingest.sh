@@ -84,5 +84,6 @@ do
         --summary="$CONTAINER_DATA_DIR/${DATASET}/${DATASET}$DATASET_FOLDER_SUFFIX/$SUMMARY_OUTPUT_PATH" \
         --importance="$CONTAINER_DATA_DIR/${DATASET}/${DATASET}$DATASET_FOLDER_SUFFIX/$IMPORTANCE_OUTPUT" \
         --type-source="$TYPE_SOURCE" \
-        --clear-existing
+        --clear-existing \
+        --metadata-only
 done
