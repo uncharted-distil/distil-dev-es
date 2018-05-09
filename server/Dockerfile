@@ -1,10 +1,6 @@
 # Set the base image to elasticsearch alpine
 FROM elasticsearch:5.4-alpine
 
-ARG smmry_key
-
-ENV SMMRY_API_KEY=$smmry_key
-
 # make sure package db is up to date
 RUN apk update
 
@@ -51,12 +47,7 @@ RUN /docker-entrypoint.sh elasticsearch -p /tmp/epid & \
 
 # remove ingest related files
 WORKDIR /
-RUN rm -r -f /distil-ingest; \
-  rm -r -f /distil-merge; \
-  rm -r -f /distil-rank; \
-  rm -r -f /distil-classify; \
-  rm /wait-for-it.sh; \
-  rm -r -f /input;
+RUN rm -r -f /distil-ingest && rm /wait-for-it.sh && rm -r -f /input
 
 # copy run script across
 ADD start_services.sh /
