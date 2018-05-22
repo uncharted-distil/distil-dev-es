@@ -26,7 +26,7 @@ do
 done
 
 CLASSIFICATION_OUTPUT_PATH=tables/classification.json
-REST_ENDPOINT=http://localhost:5000
+REST_ENDPOINT=http://127.0.0.1:5000
 CLASSIFICATION_FUNCTION=fileUpload
 
 for DATASET in "${DATASETS[@]}"
@@ -42,7 +42,7 @@ do
 done
 
 IMPORTANCE_OUTPUT=tables/importance.json
-RANKING_REST_ENDPOINT=HTTP://localhost:5001
+RANKING_REST_ENDPOINT=HTTP://127.0.0.1:5001
 RANKING_FUNCTION=pca
 NUMERIC_OUTPUT_SUFFIX=_numeric.csv
 TYPE_SOURCE=classification
@@ -83,7 +83,7 @@ do
 done
 
 METADATA_INDEX=datasets
-ES_ENDPOINT=http://localhost:9200
+ES_ENDPOINT=http://127.0.0.1:9200
 SUMMARY_OUTPUT_PATH=summary.txt
 TYPE_SOURCE=classification
 
