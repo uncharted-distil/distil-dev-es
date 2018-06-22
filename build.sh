@@ -31,7 +31,7 @@ echo -e "${HIGHLIGHT}Copying D3M data..${NC}"
 
 # copy the d3m data into the docker context
 mkdir -p ./server/data/d3m
-for DATASET in "${DATASETS[@]}"
+for DATASET in "${DATASETS_SEED[@]}"
 do
     echo "cp $HOST_DATA_DIR/$DATASET into ./server/data/d3m/$DATASET"
     cp -r $HOST_DATA_DIR/$DATASET ./server/data/d3m
