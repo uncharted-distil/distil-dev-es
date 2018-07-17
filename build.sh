@@ -28,7 +28,7 @@ mv distil-rank ./server
 mv distil-ingest ./server
 mv distil-summary ./server
 mv distil-featurize ./server
-mv distil-featurize ./cluster
+mv distil-cluster ./server
 
 echo -e "${HIGHLIGHT}Copying D3M data..${NC}"
 
