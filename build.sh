@@ -58,6 +58,12 @@ docker run -d --rm --name ranking_rest  -p 5001:5000 primitives.azurecr.io/http_
 echo "Waiting for the service to be available..."
 sleep 10
 
+# start clustering REST API container
+docker run -d --rm --name cluster_rest -p 5004:5000 unicorn:test
+./server/wait-for-it.sh -t 0 localhost:5004
+echo "Waiting for the clustering service to be available..."
+sleep 10
+
 echo -e "${HIGHLIGHT}Building image ${DOCKER_IMAGE_NAME}...${NC}"
 
 # build the docker image
@@ -73,5 +79,8 @@ docker stop classification_rest
 
 # stop ranking REST API container
 docker stop ranking_rest
+
+# stop cluster REST API container
+docker stop cluster_rest
 
 echo -e "${HIGHLIGHT}Done${NC}"
