@@ -89,7 +89,7 @@ docker stop ranking_rest
 # stop cluster REST API container
 docker stop cluster_rest
 
-# stop cluster REST API container
+# stop feature REST API container
 docker stop feature_rest
 
 echo -e "${HIGHLIGHT}Done${NC}"
