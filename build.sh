@@ -58,12 +58,6 @@ docker run -d --rm --name ranking_rest  -p 5001:5000 primitives.azurecr.io/http_
 echo "Waiting for the service to be available..."
 sleep 10
 
-# start clustering REST API container
-docker run -d --rm --name cluster_rest --volume "/home/ubuntu/datasets:/home/ubuntu/datasets" -p 5005:5005 registry.datadrivendiscovery.org/uncharted/distil-integration/unicorn-http:dev
-./server/wait-for-it.sh -t 0 localhost:5005
-echo "Waiting for the clustering service to be available..."
-sleep 10
-
 # start feature REST API container
 docker run -d --rm --name feature_rest --volume "/home/ubuntu/datasets:/home/ubuntu/datasets" -p 5002:5002 registry.datadrivendiscovery.org/uncharted/distil-integration/croc2:latest
 ./server/wait-for-it.sh -t 0 localhost:5002

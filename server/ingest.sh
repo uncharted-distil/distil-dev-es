@@ -6,10 +6,8 @@ SCHEMA=/datasetDoc.json
 OUTPUT_PATH=features/
 CLUSTER_OUTPUT_DATA=clusters/clusters.csv
 CLUSTER_OUTPUT_SCHEMA=clustersDatasetDoc.json
-DATASET_FOLDER_SUFFIX=_dataset
 HAS_HEADER=1
-CLUSTER_FUNCTION=fileupload
-CLUSTER_REST_ENDPOINT=HTTP://127.0.0.1:5005
+CLUSTER_ENDPOINT=localhost:50051
 DATA_LOCATION=/home/ubuntu/datasets/seed_datasets_current
 
 for DATASET in "${DATASETS[@]}"
@@ -18,8 +16,7 @@ do
     echo " Clustering $DATASET dataset"
     echo "--------------------------------------------------------------------------------"
     ./distil-cluster \
-        --rest-endpoint="$CLUSTER_REST_ENDPOINT" \
-        --cluster-function="$CLUSTER_FUNCTION" \
+        --endpoint="$CLUSTER_ENDPOINT" \
         --dataset="$CONTAINER_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN" \
         --media-path="$DATA_LOCATION/${DATASET}/TRAIN/dataset_TRAIN/" \
         --schema="$CONTAINER_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$SCHEMA" \
