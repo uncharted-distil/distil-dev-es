@@ -64,6 +64,11 @@ docker run -d --rm --name feature_rest --volume "/home/ubuntu/datasets:/home/ubu
 echo "Waiting for the feature service to be available..."
 sleep 10
 
+# start pipeline runner container
+docker run -d --rm --name pipeline_runner -p 50051:50051 --env D3MOUTPUTDIR=/output --env STATIC_RESOURCE_PATH=/static_resources -v "/home/ubuntu/datasets:/home/ubuntu/datasets" -v /home/ubuntu/datasets/seed_datasets_current:/input/d3m -v /output:/output -v /static_resources:/static_resources docker.uncharted.software/distil-pipeline-runner:latest
+echo "Waiting for the pipeline runner to be available..."
+sleep 10
+
 echo -e "${HIGHLIGHT}Building image ${DOCKER_IMAGE_NAME}...${NC}"
 
 # build the docker image
@@ -79,9 +84,6 @@ docker stop classification_rest
 
 # stop ranking REST API container
 docker stop ranking_rest
-
-# stop cluster REST API container
-docker stop cluster_rest
 
 # stop feature REST API container
 docker stop feature_rest
