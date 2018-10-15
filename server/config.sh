@@ -18,3 +18,6 @@ DATASETS=(32_wikiqa 185_baseball 196_autoMpg 534_cps_85_wages 66_chlorineConcent
 
 # path to data in the docker container
 CONTAINER_DATA_DIR=/input/d3m
+
+# path to data in the host with the copy of the original data
+HOST_DATA_DIR_COPY=/input/d3m

@@ -3,10 +3,9 @@
 source ./config.sh
 
 SCHEMA=/datasetDoc.json
-OUTPUT_PATH=features/
 HAS_HEADER=1
-MERGED_OUTPUT_PATH=tables/merged.csv
-OUTPUT_SCHEMA=mergedDatasetDoc.json
+MERGED_OUTPUT_PATH=merged/tables/learningData.csv
+OUTPUT_SCHEMA=merged/datasetDoc.json
 CLASSIFICATION_OUTPUT_PATH=classification.json
 IMPORTANCE_OUTPUT=importance.json
 SUMMARY_MACHINE_OUTPUT=summary-machine.json

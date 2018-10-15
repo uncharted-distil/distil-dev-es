@@ -2,54 +2,87 @@
 
 source ./server/config.sh
 
+go get -u -v github.com/unchartedsoftware/distil-ingest/cmd/distil-merge
+go get -u -v github.com/unchartedsoftware/distil-ingest/cmd/distil-classify
+go get -u -v github.com/unchartedsoftware/distil-ingest/cmd/distil-rank
+go get -u -v github.com/unchartedsoftware/distil-ingest/cmd/distil-ingest
+go get -u -v github.com/unchartedsoftware/distil-ingest/cmd/distil-summary
+go get -u -v github.com/unchartedsoftware/distil-ingest/cmd/distil-featurize
+go get -u -v github.com/unchartedsoftware/distil-ingest/cmd/distil-cluster
+env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -a github.com/unchartedsoftware/distil-ingest/cmd/distil-merge
+env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -a github.com/unchartedsoftware/distil-ingest/cmd/distil-classify
+env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -a github.com/unchartedsoftware/distil-ingest/cmd/distil-rank
+env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -a github.com/unchartedsoftware/distil-ingest/cmd/distil-ingest
+env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -a github.com/unchartedsoftware/distil-ingest/cmd/distil-summary
+env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -a github.com/unchartedsoftware/distil-ingest/cmd/distil-featurize
+env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -a github.com/unchartedsoftware/distil-ingest/cmd/distil-cluster
+mv distil-merge ./server
+mv distil-classify ./server
+mv distil-rank ./server
+mv distil-ingest ./server
+mv distil-summary ./server
+mv distil-featurize ./server
+mv distil-cluster ./server
+
+rm -rf $HOST_DATA_DIR_COPY
+mkdir -p $HOST_DATA_DIR_COPY
+for DATASET in "${DATASETS_SEED[@]}"
+do
+    echo "cp $HOST_DATA_DIR/$DATASET into $HOST_DATA_DIR_COPY/$DATASET"
+    cp -r $HOST_DATA_DIR/$DATASET $HOST_DATA_DIR_COPY
+done
+
+for DATASET in "${DATASETS_EVAL[@]}"
+do
+    echo "cp $HOST_DATA_DIR_EVAL/$DATASET into $HOST_DATA_DIR_COPY/$DATASET"
+    cp -r $HOST_DATA_DIR_EVAL/$DATASET $HOST_DATA_DIR_COPY
+done
+
 SCHEMA=/datasetDoc.json
-OUTPUT_PATH=features/
-CLUSTER_OUTPUT_DATA=clusters/clusters.csv
-CLUSTER_OUTPUT_SCHEMA=clustersDatasetDoc.json
+CLUSTER_OUTPUT_DATA=clusters/tables/learningData.csv
+CLUSTER_OUTPUT_SCHEMA=clusters/datasetDoc.json
 HAS_HEADER=1
-CLUSTER_ENDPOINT=localhost:50051
-DATA_LOCATION=/home/ubuntu/datasets/seed_datasets_current
+PRIMITIVE_ENDPOINT=localhost:50051
+DATA_LOCATION=/input/d3m
 
 for DATASET in "${DATASETS[@]}"
 do
     echo "--------------------------------------------------------------------------------"
     echo " Clustering $DATASET dataset"
     echo "--------------------------------------------------------------------------------"
-    ./distil-cluster \
-        --endpoint="$CLUSTER_ENDPOINT" \
-        --dataset="$CONTAINER_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN" \
+    ./server/distil-cluster \
+        --endpoint="$PRIMITIVE_ENDPOINT" \
+        --dataset="$HOST_DATA_DIR_COPY/${DATASET}/TRAIN/dataset_TRAIN" \
         --media-path="$DATA_LOCATION/${DATASET}/TRAIN/dataset_TRAIN/" \
-        --schema="$CONTAINER_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$SCHEMA" \
-        --output="$CONTAINER_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$CLUSTER_OUTPUT_DATA" \
-        --output-schema="$CLUSTER_OUTPUT_SCHEMA" \
+        --schema="$HOST_DATA_DIR_COPY/${DATASET}/TRAIN/dataset_TRAIN/$SCHEMA" \
+        --output="$HOST_DATA_DIR_COPY/${DATASET}/TRAIN/dataset_TRAIN/$CLUSTER_OUTPUT_DATA" \
+        --output-schema="$HOST_DATA_DIR_COPY/${DATASET}/TRAIN/dataset_TRAIN/$CLUSTER_OUTPUT_SCHEMA" \
         --has-header=$HAS_HEADER
 done
 
-FEATURE_OUTPUT_DATA=features/features.csv
-FEATURE_OUTPUT_SCHEMA=featuresDatasetDoc.json
-FEATURIZE_FUNCTION=fileupload
-REST_ENDPOINT=HTTP://127.0.0.1:5002
+FEATURE_OUTPUT_DATA=features/tables/learningData.csv
+FEATURE_OUTPUT_SCHEMA=features/datasetDoc.json
 
 for DATASET in "${DATASETS[@]}"
 do
     echo "--------------------------------------------------------------------------------"
     echo " Featurizing $DATASET dataset"
     echo "--------------------------------------------------------------------------------"
-    ./distil-featurize \
-        --rest-endpoint="$REST_ENDPOINT" \
-        --featurize-function="$FEATURIZE_FUNCTION" \
-        --dataset="$CONTAINER_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN" \
+    ./server/distil-featurize \
+        --endpoint="$PRIMITIVE_ENDPOINT" \
+        --dataset="$HOST_DATA_DIR_COPY/${DATASET}/TRAIN/dataset_TRAIN" \
         --media-path="$DATA_LOCATION/${DATASET}/TRAIN/dataset_TRAIN/" \
-        --schema="$CONTAINER_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$CLUSTER_OUTPUT_SCHEMA" \
-        --output="$CONTAINER_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN" \
-        --output-data="$FEATURE_OUTPUT_DATA" \
-        --output-schema="$FEATURE_OUTPUT_SCHEMA" \
+        --schema="$HOST_DATA_DIR_COPY/${DATASET}/TRAIN/dataset_TRAIN/$CLUSTER_OUTPUT_SCHEMA" \
+        --output="$HOST_DATA_DIR_COPY/${DATASET}/TRAIN/dataset_TRAIN/$FEATURE_OUTPUT_DATA" \
+        --output-schema="$HOST_DATA_DIR_COPY/${DATASET}/TRAIN/dataset_TRAIN/$FEATURE_OUTPUT_SCHEMA" \
         --has-header=$HAS_HEADER
 done
 
-MERGED_OUTPUT_PATH=tables/merged.csv
-MERGED_OUTPUT_HEADER_PATH=tables/mergedHeader.csv
-OUTPUT_SCHEMA=mergedDatasetDoc.json
+MERGED_DATASET_FOLDER=merged
+MERGED_OUTPUT_PATH=merged/tables/mergedNoHeader.csv
+MERGED_OUTPUT_PATH_RELATIVE=tables/learningData.csv
+MERGED_OUTPUT_HEADER_PATH=merged/tables/learningData.csv
+MERGED_OUTPUT_SCHEMA=merged/datasetDoc.json
 MERGE_HAS_HEADER=1
 
 for DATASET in "${DATASETS[@]}"
@@ -57,70 +90,52 @@ do
     echo "--------------------------------------------------------------------------------"
     echo " Merging $DATASET dataset"
     echo "--------------------------------------------------------------------------------"
-    ./distil-merge \
-        --schema="$CONTAINER_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$FEATURE_OUTPUT_SCHEMA" \
-        --data="$CONTAINER_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$FEATURE_OUTPUT_DATA" \
-        --raw-data="$CONTAINER_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/" \
-        --output-path="$CONTAINER_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$MERGED_OUTPUT_PATH" \
-        --output-path-relative="$MERGED_OUTPUT_PATH" \
-        --output-path-header="$CONTAINER_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$MERGED_OUTPUT_HEADER_PATH" \
-        --output-schema-path="$CONTAINER_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$OUTPUT_SCHEMA" \
+    ./server/distil-merge \
+        --schema="$HOST_DATA_DIR_COPY/${DATASET}/TRAIN/dataset_TRAIN/$FEATURE_OUTPUT_SCHEMA" \
+        --data="$HOST_DATA_DIR_COPY/${DATASET}/TRAIN/dataset_TRAIN/$FEATURE_OUTPUT_DATA" \
+        --raw-data="$HOST_DATA_DIR_COPY/${DATASET}/TRAIN/dataset_TRAIN/" \
+        --output-path="$HOST_DATA_DIR_COPY/${DATASET}/TRAIN/dataset_TRAIN/$MERGED_OUTPUT_PATH" \
+        --output-path-relative="$MERGED_OUTPUT_PATH_RELATIVE" \
+        --output-path-header="$HOST_DATA_DIR_COPY/${DATASET}/TRAIN/dataset_TRAIN/$MERGED_OUTPUT_HEADER_PATH" \
+        --output-schema-path="$HOST_DATA_DIR_COPY/${DATASET}/TRAIN/dataset_TRAIN/$MERGED_OUTPUT_SCHEMA" \
         --has-header=$MERGE_HAS_HEADER
 done
 
 CLASSIFICATION_OUTPUT_PATH=classification.json
-REST_ENDPOINT=http://127.0.0.1:5000
-CLASSIFICATION_FUNCTION=fileUpload
 
 for DATASET in "${DATASETS[@]}"
 do
     echo "--------------------------------------------------------------------------------"
     echo " Classifying $DATASET dataset"
     echo "--------------------------------------------------------------------------------"
-    ./distil-classify \
-        --rest-endpoint="$REST_ENDPOINT" \
-        --classification-function="$CLASSIFICATION_FUNCTION" \
-        --dataset="$CONTAINER_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$MERGED_OUTPUT_PATH" \
-        --output="$CONTAINER_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$CLASSIFICATION_OUTPUT_PATH"
+    ./server/distil-classify \
+        --endpoint="$PRIMITIVE_ENDPOINT" \
+        --dataset="$HOST_DATA_DIR_COPY/${DATASET}/TRAIN/dataset_TRAIN/$MERGED_DATASET_FOLDER" \
+        --output="$HOST_DATA_DIR_COPY/${DATASET}/TRAIN/dataset_TRAIN/$CLASSIFICATION_OUTPUT_PATH"
 done
 
 IMPORTANCE_OUTPUT=importance.json
-RANKING_REST_ENDPOINT=HTTP://127.0.0.1:5001
-RANKING_FUNCTION=pca
-NUMERIC_OUTPUT_SUFFIX=_numeric.csv
-TYPE_SOURCE=schema
-ROW_LIMIT=1000
 
 for DATASET in "${DATASETS[@]}"
 do
     echo "--------------------------------------------------------------------------------"
     echo " Ranking $DATASET dataset"
     echo "--------------------------------------------------------------------------------"
-    ./distil-rank \
-        --schema="$CONTAINER_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$OUTPUT_SCHEMA" \
-        --dataset="$CONTAINER_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$MERGED_OUTPUT_PATH" \
-        --rest-endpoint="$RANKING_REST_ENDPOINT" \
-        --ranking-function="$RANKING_FUNCTION" \
-        --ranking-output="$CONTAINER_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$DATASET$NUMERIC_OUTPUT_SUFFIX" \
-        --classification="$CONTAINER_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$CLASSIFICATION_OUTPUT_PATH" \
-        --has-header=$HAS_HEADER \
-        --row-limit=$ROW_LIMIT \
-        --output="$CONTAINER_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$IMPORTANCE_OUTPUT" \
-        --type-source="$TYPE_SOURCE"
+    ./server/distil-rank \
+        --dataset="$HOST_DATA_DIR_COPY/${DATASET}/TRAIN/dataset_TRAIN/$MERGED_DATASET_FOLDER" \
+        --endpoint="$PRIMITIVE_ENDPOINT" \
+        --output="$HOST_DATA_DIR_COPY/${DATASET}/TRAIN/dataset_TRAIN/$IMPORTANCE_OUTPUT"
 done
 
 SUMMARY_MACHINE_OUTPUT=summary-machine.json
-SUMMARY_REST_ENDPOINT=HTTP://10.108.4.42:5003
-SUMMARY_FUNCTION=fileUpload
 
 for DATASET in "${DATASETS[@]}"
 do
     echo "--------------------------------------------------------------------------------"
     echo " Summarizing $DATASET dataset"
     echo "--------------------------------------------------------------------------------"
-    ./distil-summary \
-        --rest-endpoint="$SUMMARY_REST_ENDPOINT" \
-        --summary-function="$SUMMARY_FUNCTION" \
-        --dataset="$CONTAINER_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$MERGED_OUTPUT_HEADER_PATH" \
-        --output="$CONTAINER_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$SUMMARY_MACHINE_OUTPUT"
+    ./server/distil-summary \
+        --endpoint="$PRIMITIVE_ENDPOINT" \
+        --dataset="$HOST_DATA_DIR_COPY/${DATASET}/TRAIN/dataset_TRAIN/$MERGED_DATASET_FOLDER" \
+        --output="$HOST_DATA_DIR_COPY/${DATASET}/TRAIN/dataset_TRAIN/$SUMMARY_MACHINE_OUTPUT"
 done
