@@ -30,26 +30,10 @@ mv distil-summary ./server
 mv distil-featurize ./server
 mv distil-cluster ./server
 
-echo -e "${HIGHLIGHT}Copying D3M data..${NC}"
-
 # copy the d3m data into the docker context
+echo -e "${HIGHLIGHT}Copying D3M data..${NC}"
 mkdir -p ./server/data/d3m
-for DATASET in "${DATASETS_SEED[@]}"
-do
-    echo "cp $HOST_DATA_DIR/$DATASET into ./server/data/d3m/$DATASET"
-    cp -r $HOST_DATA_DIR/$DATASET ./server/data/d3m
-done
-
-for DATASET in "${DATASETS_EVAL[@]}"
-do
-    echo "cp $HOST_DATA_DIR_EVAL/$DATASET into ./server/data/d3m/$DATASET"
-    cp -r $HOST_DATA_DIR_EVAL/$DATASET ./server/data/d3m
-done
-
-# start pipeline runner container
-docker run -d --rm --name pipeline_runner -p 50051:50051 --env D3MOUTPUTDIR=/output --env STATIC_RESOURCE_PATH=/static_resources -v "/home/ubuntu/datasets:/home/ubuntu/datasets" -v /input:/input -v /output:/output -v /static_resources:/static_resources docker.uncharted.software/distil-pipeline-runner:latest
-echo "Waiting for the pipeline runner to be available..."
-sleep 10
+cp -r $HOST_DATA_DIR_COPY ./server/data
 
 echo -e "${HIGHLIGHT}Building image ${DOCKER_IMAGE_NAME}...${NC}"
 
@@ -61,7 +45,5 @@ docker build --squash --no-cache --network=host \
     --tag docker.uncharted.software/$DOCKER_IMAGE_NAME:latest .
 cd ..
 
-# stop pipeline runner
-docker stop pipeline_runner
 
 echo -e "${HIGHLIGHT}Done${NC}"

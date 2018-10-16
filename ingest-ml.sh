@@ -38,6 +38,10 @@ do
     cp -r $HOST_DATA_DIR_EVAL/$DATASET $HOST_DATA_DIR_COPY
 done
 
+docker run -d --rm --name pipeline_runner -p 50051:50051 --env D3MOUTPUTDIR=/output --env STATIC_RESOURCE_PATH=/static_resources -v "/home/ubuntu/datasets:/home/ubuntu/datasets" -v /input:/input -v /output:/output -v /static_resources:/static_resources docker.uncharted.software/distil-pipeline-runner:latest
+echo "Waiting for the pipeline runner to be available..."
+sleep 10
+
 SCHEMA=/datasetDoc.json
 CLUSTER_OUTPUT_DATA=clusters/tables/learningData.csv
 CLUSTER_OUTPUT_SCHEMA=clusters/datasetDoc.json
