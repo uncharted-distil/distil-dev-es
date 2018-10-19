@@ -21,3 +21,4 @@ CONTAINER_DATA_DIR=/input/d3m
 
 # path to data in the host with the copy of the original data
 HOST_DATA_DIR_COPY=/input/d3m
+HOST_STATIC_RESOURCE_PATH=~/models
