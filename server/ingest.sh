@@ -24,6 +24,7 @@ do
         --es-metadata-index="$METADATA_INDEX" \
         --es-data-index="$DATASET" \
         --es-dataset-prefix="d_" \
+        --dataset-folder="$DATASET" \
         --schema="$CONTAINER_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$OUTPUT_SCHEMA" \
         --dataset="$CONTAINER_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$MERGED_OUTPUT_PATH" \
         --classification="$CONTAINER_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$CLASSIFICATION_OUTPUT_PATH" \
