@@ -38,7 +38,7 @@ ADD ingest.sh .
 
 # copy in d3m test data
 RUN mkdir -p /input
-ADD data /input
+COPY data /input
 
 # start elasticsearch and run ingest
 ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/e1f115e4ca285c3c24e847c4dd4be955e0ed51c2/wait-for-it.sh /

@@ -30,45 +30,10 @@ mv distil-summary ./server
 mv distil-featurize ./server
 mv distil-cluster ./server
 
-echo -e "${HIGHLIGHT}Copying D3M data..${NC}"
-
 # copy the d3m data into the docker context
+echo -e "${HIGHLIGHT}Copying D3M data..${NC}"
 mkdir -p ./server/data/d3m
-for DATASET in "${DATASETS_SEED[@]}"
-do
-    echo "cp $HOST_DATA_DIR/$DATASET into ./server/data/d3m/$DATASET"
-    cp -r $HOST_DATA_DIR/$DATASET ./server/data/d3m
-done
-
-for DATASET in "${DATASETS_EVAL[@]}"
-do
-    echo "cp $HOST_DATA_DIR_EVAL/$DATASET into ./server/data/d3m/$DATASET"
-    cp -r $HOST_DATA_DIR_EVAL/$DATASET ./server/data/d3m
-done
-
-# start classification REST API container
-docker run -d --rm --name classification_rest -p 5000:5000 primitives.azurecr.io/simon:1.2.0
-./server/wait-for-it.sh -t 0 localhost:5000
-echo "Waiting for the service to be available..."
-sleep 10
-
-# start ranking REST API container
-docker run -d --rm --name ranking_rest  -p 5001:5000 primitives.azurecr.io/http_features:0.4
-./server/wait-for-it.sh -t 0 localhost:5001
-echo "Waiting for the service to be available..."
-sleep 10
-
-# start clustering REST API container
-docker run -d --rm --name cluster_rest --volume "/home/ubuntu/datasets:/home/ubuntu/datasets" -p 5005:5005 registry.datadrivendiscovery.org/uncharted/distil-integration/unicorn-http:dev
-./server/wait-for-it.sh -t 0 localhost:5005
-echo "Waiting for the clustering service to be available..."
-sleep 10
-
-# start feature REST API container
-docker run -d --rm --name feature_rest --volume "/home/ubuntu/datasets:/home/ubuntu/datasets" -p 5002:5002 registry.datadrivendiscovery.org/uncharted/distil-integration/croc2:latest
-./server/wait-for-it.sh -t 0 localhost:5002
-echo "Waiting for the feature service to be available..."
-sleep 10
+cp -r $OUTPUT_DATA_DIR ./server/data
 
 echo -e "${HIGHLIGHT}Building image ${DOCKER_IMAGE_NAME}...${NC}"
 
@@ -80,16 +45,5 @@ docker build --squash --no-cache --network=host \
     --tag docker.uncharted.software/$DOCKER_IMAGE_NAME:latest .
 cd ..
 
-# stop classification REST API container
-docker stop classification_rest
-
-# stop ranking REST API container
-docker stop ranking_rest
-
-# stop cluster REST API container
-docker stop cluster_rest
-
-# stop feature REST API container
-docker stop feature_rest
 
 echo -e "${HIGHLIGHT}Done${NC}"
