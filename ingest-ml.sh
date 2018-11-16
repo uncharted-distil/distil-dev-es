@@ -136,13 +136,19 @@ done
 
 SUMMARY_MACHINE_OUTPUT=summary-machine.json
 
+# Duke fails on large dataset (geolife)
 for DATASET in "${DATASETS[@]}"
 do
     echo "--------------------------------------------------------------------------------"
     echo " Summarizing $DATASET dataset"
     echo "--------------------------------------------------------------------------------"
-    ./server/distil-summary \
-        --endpoint="$PRIMITIVE_ENDPOINT" \
-        --dataset="$OUTPUT_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$MERGED_DATASET_FOLDER" \
-        --output="$OUTPUT_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$SUMMARY_MACHINE_OUTPUT"
+    if [ "$DATASET" == "LL1_336_MS_Geolife_transport_mode_prediction" ];
+    then
+        echo "SKIPPING SUMMARY"
+    else
+        ./server/distil-summary \
+            --endpoint="$PRIMITIVE_ENDPOINT" \
+            --dataset="$OUTPUT_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$MERGED_DATASET_FOLDER" \
+            --output="$OUTPUT_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$SUMMARY_MACHINE_OUTPUT"
+    fi
 done
