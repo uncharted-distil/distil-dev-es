@@ -9,6 +9,7 @@ go get -u -v github.com/unchartedsoftware/distil-ingest/cmd/distil-ingest
 go get -u -v github.com/unchartedsoftware/distil-ingest/cmd/distil-summary
 go get -u -v github.com/unchartedsoftware/distil-ingest/cmd/distil-featurize
 go get -u -v github.com/unchartedsoftware/distil-ingest/cmd/distil-cluster
+go get -u -v github.com/unchartedsoftware/distil-ingest/cmd/distil-geocode
 env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -a github.com/unchartedsoftware/distil-ingest/cmd/distil-merge
 env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -a github.com/unchartedsoftware/distil-ingest/cmd/distil-classify
 env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -a github.com/unchartedsoftware/distil-ingest/cmd/distil-rank
@@ -16,6 +17,7 @@ env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -a github.com/unchartedsoftwa
 env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -a github.com/unchartedsoftware/distil-ingest/cmd/distil-summary
 env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -a github.com/unchartedsoftware/distil-ingest/cmd/distil-featurize
 env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -a github.com/unchartedsoftware/distil-ingest/cmd/distil-cluster
+env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -a github.com/unchartedsoftware/distil-ingest/cmd/distil-geocode
 mv distil-merge ./server
 mv distil-classify ./server
 mv distil-rank ./server
@@ -23,6 +25,7 @@ mv distil-ingest ./server
 mv distil-summary ./server
 mv distil-featurize ./server
 mv distil-cluster ./server
+mv distil-geocode ./server
 
 rm -rf $HOST_DATA_DIR_COPY
 mkdir -p $HOST_DATA_DIR_COPY
@@ -40,7 +43,18 @@ done
 
 rm -rf $OUTPUT_DATA_DIR
 mkdir -p $OUTPUT_DATA_DIR
-docker run -d --rm --name pipeline_runner -p 50051:50051 --env D3MOUTPUTDIR=/output --env STATIC_RESOURCE_PATH=/static_resources -v "/home/ubuntu/datasets:/home/ubuntu/datasets" -v /input:/input -v /output:/output -v /static_resources:/static_resources docker.uncharted.software/distil-pipeline-runner:latest
+docker run \
+    --name pipeline-runner \
+    --rm \
+    -d \
+    -p 50051:50051 \
+    --env D3MOUTPUTDIR=$D3MOUTPUTDIR \
+    --env D3MINPUTDIR=$D3MINPUTDIR \
+    --env STATIC_RESOURCE_PATH=$STATIC_RESOURCE_PATH \
+    -v $D3MINPUTDIR:$D3MINPUTDIR \
+    -v $D3MOUTPUTDIR:$D3MOUTPUTDIR \
+    -v $STATIC_RESOURCE_PATH:$STATIC_RESOURCE_PATH \
+    docker.uncharted.software/distil-pipeline-runner:latest
 echo "Waiting for the pipeline runner to be available..."
 sleep 60
 
@@ -50,7 +64,7 @@ CLUSTER_OUTPUT_DATA=clusters/tables/learningData.csv
 CLUSTER_OUTPUT_SCHEMA=clusters/datasetDoc.json
 HAS_HEADER=1
 PRIMITIVE_ENDPOINT=localhost:50051
-DATA_LOCATION=/input/d3m
+DATA_LOCATION=/tmp/d3m/input
 
 for DATASET in "${DATASETS[@]}"
 do
@@ -151,4 +165,22 @@ do
             --dataset="$OUTPUT_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$MERGED_DATASET_FOLDER" \
             --output="$OUTPUT_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$SUMMARY_MACHINE_OUTPUT"
     fi
+done
+
+GEO_OUTPUT_FOLDER=geocoded
+GEO_OUTPUT_DATA=geocoded/tables/learningData.csv
+GEO_OUTPUT_SCHEMA=geocoded/datasetDoc.json
+
+for DATASET in "${DATASETS[@]}"
+do
+    echo "--------------------------------------------------------------------------------"
+    echo " Geocoding $DATASET dataset"
+    echo "--------------------------------------------------------------------------------"
+    ./server/distil-geocode \
+        --endpoint="$PRIMITIVE_ENDPOINT" \
+        --dataset="$OUTPUT_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$MERGED_OUTPUT_SCHEMA" \
+        --classification="$OUTPUT_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$CLASSIFICATION_OUTPUT_PATH" \
+        --schema="$OUTPUT_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$MERGED_OUTPUT_SCHEMA" \
+        --output="$OUTPUT_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$GEO_OUTPUT_FOLDER" \
+        --has-header=$HAS_HEADER
 done
