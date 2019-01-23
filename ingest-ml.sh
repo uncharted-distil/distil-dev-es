@@ -94,9 +94,9 @@ do
     echo "--------------------------------------------------------------------------------"
     ./server/distil-cluster \
         --endpoint="$PRIMITIVE_ENDPOINT" \
-        --dataset="$HOST_DATA_DIR_COPY/${DATASET}/TRAIN/dataset_TRAIN/$FORMAT_OUTPUT_SCHEMA" \
+        --dataset="$OUTPUT_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$FORMAT_OUTPUT_SCHEMA" \
         --media-path="$DATA_LOCATION/${DATASET}/TRAIN/dataset_TRAIN/" \
-        --schema="$HOST_DATA_DIR_COPY/${DATASET}/TRAIN/dataset_TRAIN/$FORMAT_OUTPUT_SCHEMA" \
+        --schema="$OUTPUT_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$FORMAT_OUTPUT_SCHEMA" \
         --output="$OUTPUT_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$CLUSTER_OUTPUT_FOLDER" \
         --output-schema="$OUTPUT_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$CLUSTER_OUTPUT_SCHEMA" \
         --has-header=$HAS_HEADER
