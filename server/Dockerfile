@@ -35,6 +35,7 @@ ADD distil-summary .
 ADD distil-featurize .
 ADD distil-cluster .
 ADD distil-geocode .
+ADD distil-format .
 ADD ingest.sh .
 
 # copy in d3m test data
