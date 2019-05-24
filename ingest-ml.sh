@@ -44,6 +44,12 @@ do
     cp -r $HOST_DATA_DIR_EVAL/$DATASET $HOST_DATA_DIR_COPY
 done
 
+for DATASET in "${DATASETS_DA[@]}"
+do
+    echo "cp $HOST_DATA_DIR_DA/$DATASET into $HOST_DATA_DIR_COPY/$DATASET"
+    cp -r $HOST_DATA_DIR_DA/$DATASET $HOST_DATA_DIR_COPY
+done
+
 rm -rf $OUTPUT_DATA_DIR
 mkdir -p $OUTPUT_DATA_DIR
 docker run \
