@@ -40,3 +40,6 @@ D3MSTATICDIR=/data/static_resources
 
 # address of the docker repo
 DOCKER_REPO=docker.uncharted.software
+
+# branch of distil ingest to use
+BRANCH=update-schema-version
