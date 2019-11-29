@@ -2,7 +2,7 @@
 
 # name and version of docker image that will be created
 DOCKER_IMAGE_NAME=distil_dev_es
-DOCKER_IMAGE_VERSION=0.14.4
+DOCKER_IMAGE_VERSION=0.15.0
 
 # datasets to ingest
 #DATASETS_SEED=(32_wikiqa 185_baseball 196_autoMpg 534_cps_85_wages 66_chlorineConcentration 22_handgeometry 1491_one_hundred_plants_margin 299_libras_move 56_sunspots LL1_726_TIDY_GPS_carpool_bus_service_rating_prediction LL1_336_MS_Geolife_transport_mode_prediction_reduced LL0_acled_reduced_clean world_bank_2018 ny_weather_clean LL1_736_stock_market LL1_736_population_spawn)
@@ -42,4 +42,4 @@ D3MSTATICDIR=/data/static_resources
 DOCKER_REPO=docker.uncharted.software
 
 # branch of distil ingest to use
-BRANCH=update-schema-version
+BRANCH=master
