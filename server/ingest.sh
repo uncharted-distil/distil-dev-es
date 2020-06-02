@@ -1,7 +1,9 @@
 #!/bin/bash
 
-source ./config.sh
+source /build/distil-ingest/config.sh
 
+SCHEMA=/datasetDoc.json
+HAS_HEADER=1
 GEOCODED_OUTPUT_PATH=geocoded/tables/learningData.csv
 OUTPUT_SCHEMA=geocoded/datasetDoc.json
 CLASSIFICATION_OUTPUT_PATH=classification.json
@@ -16,7 +18,7 @@ do
     echo "--------------------------------------------------------------------------------"
     echo " Ingesting $DATASET dataset"
     echo "--------------------------------------------------------------------------------"
-    ./distil-ingest \
+    /build/distil-ingest/distil-ingest \
         --es-endpoint="$ES_ENDPOINT" \
         --es-metadata-index="$METADATA_INDEX" \
         --es-dataset-prefix="d_" \
@@ -28,3 +30,4 @@ do
         --summary-machine="$SUMMARY_MACHINE_OUTPUT" \
         --importance="$IMPORTANCE_OUTPUT"
 done
+
