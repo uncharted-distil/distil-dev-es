@@ -1,65 +1,82 @@
 # Set the base image to elasticsearch alpine
-FROM elasticsearch:5.4-alpine
+FROM elasticsearch:7.7.0
 
-# make sure package db is up to date
-RUN apk update
+# build tools
+RUN yum -y install wget
+RUN yum -y groupinstall "Development tools"
 
-# missing from baseline alpine
-RUN apk add --no-cache ca-certificates
+# build gdal
+RUN mkdir /build
+WORKDIR /build
+RUN wget http://download.osgeo.org/gdal/2.4.2/gdal-2.4.2.tar.gz
+RUN tar xvzf gdal-2.4.2.tar.gz
+WORKDIR gdal-2.4.2
 
-# download build toolchain
-RUN apk add --no-cache --virtual .build-deps \
-  gcc \
-  linux-headers \
-  make \
-  musl-dev \
-  tar
+# Prefix is pointing to my empty directory to not mix with my other GDAL install
+RUN ./configure
+RUN make
+RUN make install
+ENV PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig
+ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
+
+# setup go
+WORKDIR /build
+RUN wget https://dl.google.com/go/go1.13.12.linux-amd64.tar.gz
+RUN tar -zxvf go1.13.12.linux-amd64.tar.gz -C /usr/local
+RUN mkdir /go_home
+ENV GOROOT=/usr/local/go
+ENV GOPATH=/go_home
+ENV PATH=$GOPATH/bin:$GOROOT/bin:$PATH
+
+# get go to build ingest
+ARG DISTIL_BRANCH
+ENV GOPROXY=direct
+ENV GO111MODULE=on
+
+# copy in distil-ingest
+RUN mkdir -p /build/distil-ingest
+WORKDIR /build/distil-ingest
+ADD config.sh .
+ADD ingest.sh .
+RUN env GOOS=linux GOARCH=amd64 go get -a -v github.com/uncharted-distil/distil-ingest/cmd/distil-ingest@$DISTIL_BRANCH
+RUN cp $GOPATH/bin/distil-ingest .
 
 # base ES image sets default data dir to volume which means it won't persist
 # if we ingest.  We make a new directory for data here and update the config
 # file to point to it.
+WORKDIR /usr/share/elasticsearch
 RUN mkdir /data && \
-  chown -R elasticsearch:elasticsearch /data && \
-  echo 'path.data: /data' >> config/elasticsearch.yml && \
-  echo 'http.compression: true' >> config/elasticsearch.yml
-
-# copy in distil-ingest
-RUN mkdir -p /distil-ingest
-WORKDIR /distil-ingest
-ADD config.sh .
-ADD distil-ingest .
-ADD distil-merge .
-ADD distil-rank .
-ADD distil-classify .
-ADD distil-summary .
-ADD distil-featurize .
-ADD distil-cluster .
-ADD distil-geocode .
-ADD distil-format .
-ADD ingest.sh .
+    chown -R elasticsearch:elasticsearch /data && \
+    echo 'path.data: /data' >> config/elasticsearch.yml && \
+    echo 'http.compression: true' >> config/elasticsearch.yml
+# also flag ES to run in single instance mode (for dev/test configs)
+ENV xpack.security.enabled=false
+ENV discovery.type=single-node
 
 # copy in d3m test data
 RUN mkdir -p /input
 COPY data /input
 
-# start elasticsearch and run ingest
-ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/e1f115e4ca285c3c24e847c4dd4be955e0ed51c2/wait-for-it.sh /
-RUN /docker-entrypoint.sh elasticsearch -p /tmp/epid & \
-  /bin/bash /wait-for-it.sh -t 0 localhost:9200 -- /distil-ingest/ingest.sh; \
-  kill $(cat /tmp/epid) && wait $(cat /tmp/epid); \
-  exit 0;
-
-# remove ingest related files
-WORKDIR /
-RUN rm -r -f /distil-ingest && rm /wait-for-it.sh && rm -r -f /input
-
-# copy run script across
+# copy in support scripts
+ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/e1f115e4ca285c3c24e847c4dd4be955e0ed51c2/wait-for-it.sh /build
+RUN chmod 777 /build/wait-for-it.sh
 ADD start_services.sh /
 
-# expose standard ports
+# start up ES and ingest data into it
+USER elasticsearch
+RUN elasticsearch & \
+    /bin/bash /build/wait-for-it.sh -t 90 localhost:9200 -- /build/distil-ingest/ingest.sh; \
+    exit 0;
+
+# clean up all the build cruft
+USER root
+RUN rm -rf /build
+RUN rm -rf /input
+
+#expose standard ports
 EXPOSE 9200
 EXPOSE 9300
 
+# make sure we run ES as the elasticsearch user (running as root is not allowed)
 USER elasticsearch
-
 CMD . /start_services.sh
