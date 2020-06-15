@@ -72,6 +72,10 @@ RUN elasticsearch & \
 USER root
 RUN rm -rf /build
 RUN rm -rf /input
+RUN rm -rf /go_home
+RUN rm -rf /usr/local/go
+RUN rm -rf /usr/local/lib
+RUN mkdir /usr/local/lib
 
 #expose standard ports
 EXPOSE 9200
