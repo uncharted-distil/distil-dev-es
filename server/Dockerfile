@@ -34,6 +34,8 @@ ENV GOPROXY=direct
 ENV GO111MODULE=on
 
 # copy in distil-ingest
+RUN yum -y install http://opensource.wandisco.com/centos/7/git/x86_64/wandisco-git-release-7-2.noarch.rpm
+RUN yum -y install git
 RUN mkdir -p /build/distil-ingest
 WORKDIR /build/distil-ingest
 ADD config.sh .
