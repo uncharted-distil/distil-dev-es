@@ -1,5 +1,5 @@
 # Set the base image to elasticsearch alpine
-FROM elasticsearch:7.7.0
+FROM docker-hub.uncharted.software/elasticsearch:7.7.0
 
 # build tools
 RUN yum -y install wget
