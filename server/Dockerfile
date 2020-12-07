@@ -64,6 +64,7 @@ ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/e1f115e4ca285c3c24e8
 RUN chmod 777 /build/wait-for-it.sh
 ADD start_services.sh /
 
+ARG CACHEBUSTER=0
 # start up ES and ingest data into it
 USER elasticsearch
 RUN elasticsearch & \

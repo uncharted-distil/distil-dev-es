@@ -1,3 +1,4 @@
+#!/bin/bash
 
 source ./server/config.sh
 
@@ -16,7 +17,20 @@ echo -e "${HIGHLIGHT}Building image ${DOCKER_IMAGE_NAME}...${NC}"
 # build the docker image
 cd server
 
-docker build --build-arg DISTIL_BRANCH=$BRANCH --squash --network=host \
+CACHEBUSTER_VAL=0
+while getopts ":f" opt; do
+  case $opt in
+    f)
+      CACHEBUSTER_VAL=$(date +%s)
+      echo "Forcing re-install of primitives"
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      ;;
+  esac
+done
+
+docker build --build-arg CACHEBUSTER=$CACHEBUSTER_VAL --build-arg DISTIL_BRANCH=$BRANCH --squash --network=host \
     --tag $DOCKER_REPO/$DOCKER_IMAGE_NAME:${DOCKER_IMAGE_VERSION} \
     --tag $DOCKER_REPO/$DOCKER_IMAGE_NAME:latest .
 cd ..
