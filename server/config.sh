@@ -29,7 +29,7 @@ DATASETS=(185_baseball_MIN_METADATA 196_autoMpg_MIN_METADATA bigearth_tiny LL1_t
 #DATASETS=(JIDO_SOHR_Tab_Articles_8569 LL0_USER_EVAL_TASK1_1100_popularkids DA_college_debt)
 
 # path to data in the docker container
-CONTAINER_DATA_DIR=/input/d3m
+CONTAINER_DATA_DIR=/tmp/d3m/input
 
 # path to data in the host with the copy of the original data
 HOST_DATA_DIR_COPY=/tmp/d3m/input
@@ -49,4 +49,4 @@ export SOLUTION_COMPUTE_PULL_TIMEOUT=300
 export SOLUTION_COMPUTE_PULL_MAX=100
 
 # branch of distil ingest to use
-BRANCH=f2239554819c35a11c472980682538edab58eb0e
+BRANCH=7c43522ea29486cf690d3c24a0075c95684ed16b

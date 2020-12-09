@@ -56,8 +56,8 @@ ENV xpack.security.enabled=false
 ENV discovery.type=single-node
 
 # copy in d3m test data
-RUN mkdir -p /input
-COPY data /input
+RUN mkdir -p /tmp/d3m
+COPY data /tmp/d3m
 
 # copy in support scripts
 ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/e1f115e4ca285c3c24e847c4dd4be955e0ed51c2/wait-for-it.sh /build
@@ -74,7 +74,7 @@ RUN elasticsearch & \
 # clean up all the build cruft
 USER root
 RUN rm -rf /build
-RUN rm -rf /input
+RUN rm -rf /tmp
 RUN rm -rf /go_home
 RUN rm -rf /usr/local/go
 RUN rm -rf /usr/local/lib

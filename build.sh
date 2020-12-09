@@ -9,8 +9,8 @@ NC='\033[0m'
 echo -e "${HIGHLIGHT}Copying D3M data..${NC}"
 mkdir -p ./server/data
 cp -r $OUTPUT_DATA_DIR ./server/data
-rm -rf ./server/data/d3m
-mv ./server/data/output ./server/data/d3m
+rm -rf ./server/data/input
+mv ./server/data/output ./server/data/input
 
 echo -e "${HIGHLIGHT}Building image ${DOCKER_IMAGE_NAME}...${NC}"
 

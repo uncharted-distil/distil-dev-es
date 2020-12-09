@@ -43,29 +43,26 @@ done
 
 rm -rf $OUTPUT_DATA_DIR
 mkdir -p $OUTPUT_DATA_DIR
-docker run \
-    --name distil-auto-ml \
-    --rm \
-    -d \
-    -p 45042:45042 \
-    --env D3MOUTPUTDIR=$OUTPUT_DATA_DIR \
-    --env D3MINPUTDIR=$HOST_DATA_DIR_COPY \
-    --env D3MSTATICDIR=$D3MSTATICDIR \
-    --env PROGRESS_INTERVAL=60 \
-    -v $HOST_DATA_DIR_COPY:$HOST_DATA_DIR_COPY \
-    -v $OUTPUT_DATA_DIR:$OUTPUT_DATA_DIR \
-    -v $D3MSTATICDIR:$D3MSTATICDIR \
-    registry.datadrivendiscovery.org/uncharted/distil-integration/distil-auto-ml:latest
+#docker run \
+#    --name distil-auto-ml \
+#    --rm \
+#    -d \
+#    -p 45042:45042 \
+#    --env D3MOUTPUTDIR=$OUTPUT_DATA_DIR \
+#    --env D3MINPUTDIR=$HOST_DATA_DIR_COPY \
+#    --env D3MSTATICDIR=$D3MSTATICDIR \
+#    --env PROGRESS_INTERVAL=60 \
+#    -v $HOST_DATA_DIR_COPY:$HOST_DATA_DIR_COPY \
+#    -v $OUTPUT_DATA_DIR:$OUTPUT_DATA_DIR \
+#    -v $D3MSTATICDIR:$D3MSTATICDIR \
+#    registry.datadrivendiscovery.org/uncharted/distil-integration/distil-auto-ml:latest
 echo "Waiting for the pipeline runner to be available..."
 sleep 200
 
 SCHEMA=/datasetDoc.json
 HAS_HEADER=1
 PRIMITIVE_ENDPOINT=localhost:45042
-DATA_LOCATION=/tmp/d3m/input
 CLUSTER_OUTPUT_FOLDER=clusters
-CLUSTER_OUTPUT_DATA=clusters/tables/learningData.csv
-CLUSTER_OUTPUT_SCHEMA=clusters/datasetDoc.json
 
 for DATASET in "${DATASETS[@]}"
 do
@@ -81,11 +78,6 @@ do
 done
 
 MERGED_DATASET_FOLDER=merged
-MERGED_OUTPUT_PATH=merged/tables/mergedNoHeader.csv
-MERGED_OUTPUT_PATH_RELATIVE=tables/learningData.csv
-MERGED_OUTPUT_HEADER_PATH=merged/tables/learningData.csv
-MERGED_OUTPUT_SCHEMA=merged/datasetDoc.json
-MERGE_HAS_HEADER=1
 
 for DATASET in "${DATASETS[@]}"
 do
@@ -96,13 +88,11 @@ do
         --endpoint="$PRIMITIVE_ENDPOINT" \
         --dataset="${DATASET}" \
         --input="$HOST_DATA_DIR_COPY" \
-        --schema="$OUTPUT_DATA_DIR/${DATASET}/$CLUSTER_OUTPUT_SCHEMA" \
+        --schema="$HOST_DATA_DIR_COPY/${DATASET}/TRAIN/dataset_TRAIN/$SCHEMA" \
         --output="$OUTPUT_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$MERGED_DATASET_FOLDER"
 done
 
 FORMAT_OUTPUT_FOLDER=format
-FORMAT_OUTPUT_DATA=format/tables/learningData.csv
-FORMAT_OUTPUT_SCHEMA=format/datasetDoc.json
 
 for DATASET in "${DATASETS[@]}"
 do
@@ -113,11 +103,10 @@ do
         --endpoint="$PRIMITIVE_ENDPOINT" \
         --dataset="${DATASET}" \
         --input="$HOST_DATA_DIR_COPY" \
-        --schema="$OUTPUT_DATA_DIR/${DATASET}/$MERGED_OUTPUT_SCHEMA" \
+        --schema="$HOST_DATA_DIR_COPY/${DATASET}/TRAIN/dataset_TRAIN/$SCHEMA" \
         --output="$OUTPUT_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$FORMAT_OUTPUT_FOLDER"
 done
 
-CLEANING_OUTPUT_SCHEMA=clean/datasetDoc.json
 CLEANING_DATASET_FOLDER=clean
 
 for DATASET in "${DATASETS[@]}"
@@ -127,9 +116,9 @@ do
     echo "--------------------------------------------------------------------------------"
     ./server/distil-clean \
         --endpoint="$PRIMITIVE_ENDPOINT" \
-        --input="$HOST_DATA_DIR_COPY" \
-        --schema="$OUTPUT_DATA_DIR/${DATASET}/$FORMAT_OUTPUT_SCHEMA" \
         --dataset="${DATASET}" \
+        --input="$HOST_DATA_DIR_COPY" \
+        --schema="$HOST_DATA_DIR_COPY/${DATASET}/TRAIN/dataset_TRAIN/$SCHEMA" \
         --output="$OUTPUT_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$CLEANING_DATASET_FOLDER"
 done
 
@@ -143,7 +132,7 @@ do
     ./server/distil-classify \
         --endpoint="$PRIMITIVE_ENDPOINT" \
         --input="$HOST_DATA_DIR_COPY" \
-        --schema="$OUTPUT_DATA_DIR/${DATASET}/$CLEANING_OUTPUT_SCHEMA" \
+        --schema="$HOST_DATA_DIR_COPY/${DATASET}/TRAIN/dataset_TRAIN/$SCHEMA" \
         --dataset="${DATASET}" \
         --output="$OUTPUT_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$CLASSIFICATION_OUTPUT_PATH"
 done
@@ -158,7 +147,7 @@ do
     ./server/distil-rank \
         --endpoint="$PRIMITIVE_ENDPOINT" \
         --input="$HOST_DATA_DIR_COPY" \
-        --schema="$OUTPUT_DATA_DIR/${DATASET}/$CLEANING_OUTPUT_SCHEMA" \
+        --schema="$HOST_DATA_DIR_COPY/${DATASET}/TRAIN/dataset_TRAIN/$SCHEMA" \
         --dataset="${DATASET}" \
         --output="$OUTPUT_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$IMPORTANCE_OUTPUT"
 done
@@ -178,7 +167,7 @@ do
         ./server/distil-summary \
             --endpoint="$PRIMITIVE_ENDPOINT" \
             --input="$HOST_DATA_DIR_COPY" \
-            --schema="$OUTPUT_DATA_DIR/${DATASET}/$CLEANING_OUTPUT_SCHEMA" \
+            --schema="$HOST_DATA_DIR_COPY/${DATASET}/TRAIN/dataset_TRAIN/$SCHEMA" \
             --dataset="${DATASET}" \
             --output="$OUTPUT_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$SUMMARY_MACHINE_OUTPUT"
     fi
@@ -193,10 +182,14 @@ do
     echo "--------------------------------------------------------------------------------"
     echo " Geocoding $DATASET dataset"
     echo "--------------------------------------------------------------------------------"
-    ./server/distil-geocode \
-        --endpoint="$PRIMITIVE_ENDPOINT" \
-        --input="$HOST_DATA_DIR_COPY" \
-        --dataset="${DATASET}" \
-        --schema="$OUTPUT_DATA_DIR/${DATASET}/$CLEANING_OUTPUT_SCHEMA" \
-        --output="$OUTPUT_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$GEO_OUTPUT_FOLDER"
+#    ./server/distil-geocode \
+#        --endpoint="$PRIMITIVE_ENDPOINT" \
+#        --input="$HOST_DATA_DIR_COPY" \
+#        --dataset="${DATASET}" \
+#        --schema="$HOST_DATA_DIR_COPY/${DATASET}/TRAIN/dataset_TRAIN/$SCHEMA" \
+#        --output="$OUTPUT_DATA_DIR/${DATASET}/TRAIN/dataset_TRAIN/$GEO_OUTPUT_FOLDER"
+    # copy the data to the right path for ingest, and also copy it so that the dataset folder gets set properly on ingest
+    mkdir -p "$OUTPUT_DATA_DIR/${DATASET}/TRAIN"
+    cp -r "$HOST_DATA_DIR_COPY/${DATASET}/TRAIN/dataset_TRAIN" "$OUTPUT_DATA_DIR/${DATASET}/TRAIN/"
+    cp -r "$HOST_DATA_DIR_COPY/${DATASET}/TRAIN/dataset_TRAIN" "$OUTPUT_DATA_DIR/${DATASET}/"
 done
